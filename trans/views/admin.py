@@ -288,19 +288,32 @@ class FreezeUserContest(LoginRequiredMixin, View):
         user = User.objects.get(username=username)
         contest = Contest.objects.filter(id=contest_id).first()
         if contest is None:
-            return HttpResponseNotFound("There is no contest")
+            return HttpResponseNotFound('There is no contest')
 
-        extra_country1 = request.POST.get('extra_country1', 'None')
-        extra_country2 = request.POST.get('extra_country2', 'None')
-        extra_country1_count = request.POST.get('extra_country1_count', 0)
-        extra_country2_count = request.POST.get('extra_country2_count', 0)
+        extra_country_1_code = request.POST.get('extra_country_1_code', '')
+        extra_country_2_code = request.POST.get('extra_country_2_code', '')
+        extra_country_1_count = int(request.POST.get('extra_country_1_count', 0))
+        extra_country_2_count = int(request.POST.get('extra_country_2_count', 0))
+
+        if extra_country_1_count > 0 and extra_country_2_count > 0 and\
+            extra_country_1_code == extra_country_2_code and\
+            extra_country_1_code:
+            return HttpResponseBadRequest(
+                'The extra countries cannot be the same.')
+        if extra_country_1_code and extra_country_1_count == 0 or\
+            extra_country_2_code and extra_country_2_count == 0:
+            return HttpResponseBadRequest('Number of copies should be positive.')
+        if not extra_country_1_code and extra_country_1_count > 0 or\
+            not extra_country_2_code and extra_country_2_count > 0:
+            return HttpResponseBadRequest(
+                'Extra countries (with copies) must be non-empty.')
 
         user_contest, created = UserContest.objects.get_or_create(contest=contest, user=user)
         user_contest.frozen = True
-        user_contest.extra_country1 = extra_country1
-        user_contest.extra_country2 = extra_country2
-        user_contest.extra_country1_count = extra_country1_count
-        user_contest.extra_country2_count = extra_country2_count
+        user_contest.extra_country_1_code = extra_country_1_code
+        user_contest.extra_country_2_code = extra_country_2_code
+        user_contest.extra_country_1_count = extra_country_1_count
+        user_contest.extra_country_2_count = extra_country_2_count
         user_contest.note = note
         user_contest.save()
 

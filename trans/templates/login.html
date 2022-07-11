@@ -32,11 +32,11 @@
                         <img class="login-img" src="/static/img/logo.svg">
                     </div>
 
+                    <h1 class="site-title">Task Translation System</h1>
+
                     <div class="login-error">
                         {% if login_error %}<span>wrong login information</span>{% endif %}
                     </div>
-
-                    <h1 class="site-title">Task Translation System</h1>
 
                     <form action="{% url 'login' %}" id="login_form" method="POST">
                         {% csrf_token %}

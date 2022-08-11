@@ -18,6 +18,7 @@ from trans.forms import UploadFileForm
 from trans.models import User, Task, Translation, Contest, UserContest, Country
 from trans.utils import is_translate_in_editing, unleash_edit_token, print_job_queue
 from trans.utils.pdf import build_final_pdf, merge_final_pdfs
+from trans.utils.md import save_final_md
 from trans.utils.translation import get_trans_by_user_and_task
 
 
@@ -265,6 +266,8 @@ class FreezeTranslationView(View):
                     trans.final_pdf = File(f)
                     # Needs to be called while the file is open.
                     trans.save()
+                # We don't use the markdown anywhere else, only saving a copy for easier reference.
+                md_path = save_final_md(trans)
             else:
                 trans.translating = False
                 trans.save()
